@@ -1,8 +1,8 @@
 FROM quay.io/geodocker/base:latest
 
-ENV ACCUMULO_VERSION 1.7.2
+ENV ACCUMULO_VERSION 1.7.0
 ENV GEOSERVER_VERSION 2.9.0
-ENV GEOMESA_VERSION 1.2.4
+ENV GEOMESA_VERSION 1.2.5
 ENV GEOWAVE_VERSION 0.9.3
 ENV TOMCAT_VERSION 8.0.35
 ENV CATALINA_OPTS "-Xmx4g -XX:MaxPermSize=512M -Duser.timezone=UTC -server -Djava.awt.headless=true"
@@ -29,12 +29,9 @@ RUN set -x \
   && unzip -j /tmp/geoserver-wps.zip -d /opt/tomcat/webapps/geoserver/WEB-INF/lib/ \
   && rm -rf /tmp/geoserver-wps.zip
 
-# Install geomesa specific geoserver jar
-RUN set -x \
-  && mkdir -p /tmp/geomesa \
-  && curl -sS -L http://repo.locationtech.org/content/repositories/geomesa-releases/org/locationtech/geomesa/geomesa-dist/${GEOMESA_VERSION}/geomesa-dist-${GEOMESA_VERSION}-bin.tar.gz \
-  | tar -zx -C /opt/tomcat/webapps/geoserver/WEB-INF/lib/ --strip-components=3 \
-    geomesa-${GEOMESA_VERSION}/dist/accumulo/geomesa-accumulo-distributed-runtime-${GEOMESA_VERSION}.jar
+# Install geomesa specific geoserver jars
+ADD geomesa-accumulo-distributed-runtime-${GEOMESA_VERSION}.jar /opt/tomcat/webapps/geoserver/WEB-INF/lib/ 
+ADD geomesa-process-${GEOMESA_VERSION}.jar /opt/tomcat/webapps/geoserver/WEB-INF/lib/
 
 # Install jars for geomesa/geowave integration
 RUN set -x \
